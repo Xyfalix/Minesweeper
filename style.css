@@ -1,0 +1,42 @@
+:root {
+    --board-row-size: 8;
+    --board-col-size: 8
+}
+
+body {
+    display: grid;
+    grid-template-columns: 1fr 100px 100px 100px 100px 1fr;
+    grid-template-rows: 1fr 100px 400px 50px 50px 50px 1fr;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #f0f0f0;
+  }
+  
+  .board {
+    display: grid;
+    grid-template-columns: repeat(var(--board-col-size), 30px);
+    grid-template-rows: repeat(var(--board-row-size), 30px);
+    gap: 2px;
+    grid-column: 2 / 6;
+    grid-row: 3 / 4;
+  }
+  
+  .button {
+    width: 30px;
+    height: 30px;
+    background-color: #ddd;
+    border: 0.5px solid rgb(214, 203, 203);
+    cursor: pointer;
+    font-size: 14px;
+    box-shadow: 3px 3px grey;
+  }
+
+  .mine-timer-container {
+    display: flex;
+    justify-content: space-evenly;
+    grid-column: 2 / 6;
+    grid-row: 2 / 3;
+  }
+  

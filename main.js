@@ -1,13 +1,39 @@
-// Pseudocode here
-
-// Html and CSS code for Frame 1 (Minesweeper board)
-// 1. Create the 8 x 8 board (Placeholder to be overwritten with Js)
-// 2. Create the Mines Left and Timer interface
-// 3. Create the name text, entries and change name buttons
-// 4. Create the difficulty level text and difficulty level selector
-// 5. Create the View High Scores Text
-
 // JavaScript Code for Frame 1 (Minesweeper board)
+// create Minesweeper board element
+const board = document.querySelector('.board');
+
+// grid row and col sizes will change when difficulty changes
+let gridRowSize = 6; 
+let gridColSize = 6;
+let rows = gridRowSize;
+let cols = gridColSize;
+
+function createButton(row, col) {
+  const button = document.createElement('button');
+  button.textContent = `${row},${col}`;
+  button.classList.add('button');
+  button.addEventListener('click', () => {
+    alert(`Button clicked: Row ${row}, Column ${col}`);
+  });
+  return button;
+}
+
+function setBoardSize() {
+    // set row gridsize in CSS
+    document.documentElement.style.setProperty('--board-row-size', gridRowSize);
+    // set col gridsize in CSS
+    document.documentElement.style.setProperty('--board-col-size', gridColSize);
+
+    for (let i = 1; i <= rows; i++) {
+        for (let j = 1; j <= cols; j++) {
+            const button = createButton(i, j);
+            board.appendChild(button);
+        }
+    }
+}
+
+setBoardSize();
+
 // 1. Create click functionality for each cell in the 8 x 8 board
 // 2. Spawn mines (10 in easy mode) randomly in the remaining cells after user left clicks the first cell. First cell will not contain a mine.
 // 3. Create timer to start counting in seconds once user clicks on the first cell.
