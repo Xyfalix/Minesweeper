@@ -2,13 +2,16 @@
 // create Minesweeper board element
 const board = document.querySelector('.board');
 const timerDisplay = document.querySelector('.timer-display');
+const rightClickValues = ['🚩', '?', '']
 let isFirstClick = true;
 let startTime = 0; // Initialize the start time to 0
 let intervalId = null; // Initialize interval ID to null
+let rightClickValuesIndex = 0;
 
 // grid row and col sizes will change when difficulty changes
 let gridRowSize = 8; 
 let gridColSize = 8;
+
 
 function updateTimer() {
     const currentTime = Date.now(); // Get the current time in milliseconds
@@ -22,29 +25,46 @@ function createButton(row, col) {
   button.classList.add('button');
   button.setAttribute('data-row', row); // Set data attribute for row
   button.setAttribute('data-col', col); // Set data attribute for column
+  // create event listener for cell left click.
   button.addEventListener('click', (event) => {
     // exit event listener if button has already been clicked.
-    if (button.classList.contains('clicked')) {
+    // exit event listener if 🚩 or ? has been placed on cell
+    if (button.classList.contains('clicked') || button.textContent === '🚩' || button.textContent === '?') {
         return
     }
+    const clickedRow = event.target.getAttribute('data-row');
+    const clickedCol = event.target.getAttribute('data-col');
     alert(`Button clicked: Row ${row}, Column ${col}`);
     if (isFirstClick) {
+        // Start timer on first left click
         if (intervalId === null) {
             startTime = Date.now();
             intervalId = setInterval(updateTimer, 1000);
         }
-        const clickedRow = event.target.getAttribute('data-row');
-        const clickedCol = event.target.getAttribute('data-col');
         console.log(`button clickedRow is ${clickedRow}, button clickedCol is ${clickedCol}`)
         spawnMine(clickedRow, clickedCol);
         floodFill(parseInt(clickedRow), parseInt(clickedCol));
         isFirstClick = false;
     } else {
-        const clickedRow = event.target.getAttribute('data-row');
-        const clickedCol = event.target.getAttribute('data-col');
         console.log(`button clickedRow is ${clickedRow}, button clickedCol is ${clickedCol}`)
         floodFill(parseInt(clickedRow), parseInt(clickedCol));
     }
+  });
+
+  button.addEventListener('contextmenu', (event) => {
+    event.preventDefault(); // prevent the right click menu from appearing
+
+    // exit event listener if button has already been left clicked
+    // also exits event listener if user has not made the first left click
+    if (button.classList.contains('clicked') || isFirstClick) {
+        return
+    }
+    
+    // cycles clicked cell between  🚩, ?, and empty
+    button.textContent = rightClickValues[rightClickValuesIndex]
+
+    rightClickValuesIndex = (rightClickValuesIndex + 1) % rightClickValues.length;
+
   });
 
   return button;
@@ -114,8 +134,7 @@ function mineAdjacentCheck(clickedRow, clickedCol) {
             }
         }
     }
-    // const clickedButton = board.querySelector(`button[data-row="${clickedRow}"][data-col="${clickedCol}"]`);
-    // clickedButton.textContent = mineCounter;
+
     return mineCounter;
 }   
 
@@ -159,11 +178,7 @@ function floodFill(clickedRow, clickedCol) {
 
 setBoardSize(gridRowSize, gridColSize);
 
-// 5. Create right click funcionality for each cell.
-// 5a. The first right click will flag the cell as a mine.
-// 5b. Right clicking the same cell will change cell marking to a ?.
-// 5c. Right clicking the same cell again will reset the cell marking.
-// 6. Create board for medium difficulty (16 x 16 with 40 mines) and hard difficulty (30 x 16 with 99 mines)
+//? TODO List
 // 7. Create functionality for the Change Name button
 
 // 8. Create dropdown functionality for difficulty level selection. 
