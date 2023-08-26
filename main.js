@@ -1,16 +1,18 @@
 // JavaScript Code for Frame 1 (Minesweeper board)
 // create Minesweeper board element
 const board = document.querySelector('.board');
+let isFirstClick = true;
 
 // This event listener will only trigger once on the board.
 // Timer and mine spawning function will run here.
-board.addEventListener('click', function firstClickHandler(event) {
-    const clickedRow = event.target.getAttribute('data-row');
-    const clickedCol = event.target.getAttribute('data-col');
-    spawnMine();
-    mineAdjacentCheck(parseInt(clickedRow), parseInt(clickedCol));
-    board.removeEventListener('click', firstClickHandler);
-  })
+// board.addEventListener('click', function firstClickHandler(event) {
+//     const clickedRow = event.target.getAttribute('data-row');
+//     const clickedCol = event.target.getAttribute('data-col');
+//     spawnMine();
+//     console.log("board floodFill runs here")
+//     floodFill(parseInt(clickedRow), parseInt(clickedCol));
+//     board.removeEventListener('click', firstClickHandler);
+//   })
 
 // grid row and col sizes will change when difficulty changes
 let gridRowSize = 8; 
@@ -26,9 +28,19 @@ function createButton(row, col) {
   button.setAttribute('data-col', col); // Set data attribute for column
   button.addEventListener('click', (event) => {
     alert(`Button clicked: Row ${row}, Column ${col}`);
-    const clickedRow = event.target.getAttribute('data-row');
-    const clickedCol = event.target.getAttribute('data-col');
-    mineAdjacentCheck(parseInt(clickedRow), parseInt(clickedCol));
+    if (isFirstClick) {
+        spawnMine();
+        const clickedRow = event.target.getAttribute('data-row');
+        const clickedCol = event.target.getAttribute('data-col');
+        console.log(`button clickedRow is ${clickedRow}, button clickedCol is ${clickedCol}`)
+        floodFill(parseInt(clickedRow), parseInt(clickedCol));
+        isFirstClick = false;
+    } else {
+        const clickedRow = event.target.getAttribute('data-row');
+        const clickedCol = event.target.getAttribute('data-col');
+        console.log(`button clickedRow is ${clickedRow}, button clickedCol is ${clickedCol}`)
+        floodFill(parseInt(clickedRow), parseInt(clickedCol));
+    }
   });
 
   return button;
@@ -52,17 +64,20 @@ function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min)) + min; // Output will be a random integer between min and max (exclusive)
 }
 
-function spawnMine() {
+function spawnMine(clickedRow, clickedCol) {
     // create array that will represent the row & col coordinates to spawn mines.
     const mineArray = [];
     while (mineArray.length < 10) {
         mineCoordinates = [getRandomInt(0, gridRowSize), getRandomInt(0, gridColSize)]
         console.log(`mine coordinates are ${mineCoordinates}`);
 
-        // Add mineCoordinates into mineArray only if coordinates do not exist in array.
-        if (!mineArray.some(coord => coord[0] === mineCoordinates[0] && coord[1] === mineCoordinates[1])) { 
-            mineArray.push(mineCoordinates);
-        }
+        // Check that mineCoordinates are not at clicked cell
+        if (mineCoordinates[0] !== clickedRow && mineCoordinates[1] !== clickedCol) {
+            // Add mineCoordinates into mineArray only if coordinates do not exist in array.
+            if (!mineArray.some(coord => coord[0] === mineCoordinates[0] && coord[1] === mineCoordinates[1])) { 
+                mineArray.push(mineCoordinates);
+            }
+        }    
     }
 
     // Update the buttons corresponding to mine coordinates
@@ -81,11 +96,11 @@ function spawnMine() {
 // count the number of adjacent mines on the clicked cell. Arguments for clicked row and col must be specified.
 function mineAdjacentCheck(clickedRow, clickedCol) {
     let mineCounter = 0;
-    console.log(clickedRow, clickedCol);
-    for (i = clickedRow - 1; i <= clickedRow + 1; i++) {
-        for (j = clickedCol - 1; j <= clickedCol + 1; j++) {
+    console.log(`clickedRow is ${clickedRow}, clickedCol is ${clickedCol}`);
+    for (let i = clickedRow - 1; i <= clickedRow + 1; i++) {
+        for (let j = clickedCol - 1; j <= clickedCol + 1; j++) {
             if (!(i === clickedRow && j === clickedCol)) {
-                console.log(`row is ${i}, col is ${j}.`)
+                console.log(`mineAdjCheck row is ${i}, mineAdjCheck col is ${j}.`)
                 const button = board.querySelector(`button[data-row="${i}"][data-col="${j}"]`);
                 if (button && button.textContent === '💣') {
                     mineCounter += 1; 
@@ -93,13 +108,45 @@ function mineAdjacentCheck(clickedRow, clickedCol) {
             }
         }
     }
-    const clickedButton = board.querySelector(`button[data-row="${clickedRow}"][data-col="${clickedCol}"]`);
-    clickedButton.textContent = mineCounter;
+    // const clickedButton = board.querySelector(`button[data-row="${clickedRow}"][data-col="${clickedCol}"]`);
+    // clickedButton.textContent = mineCounter;
+    return mineCounter;
+}   
+
+// recursive function that will open all adjacent squares if clicked square has no mines.
+function floodFill(clickedRow, clickedCol) {
+    // Base Case: if any adjacent square has a mine, show the number of adjacent mines on clicked square.
+    const adjMineCount = mineAdjacentCheck(clickedRow, clickedCol);
+    console.log(`floodFill triggered on row ${clickedRow}, col ${clickedCol}. Adjacent mine count is ${adjMineCount}.`)
+    if (adjMineCount > 0) {
+        console.log('Base case triggered.');
+        const clickedButton = board.querySelector(`button[data-row="${clickedRow}"][data-col="${clickedCol}"]`);
+        clickedButton.classList.add('clicked');
+        clickedButton.textContent = adjMineCount.toString();
+        return;
+
+    } else {
+         // Recursive Case: Uncover all adjacent cells if clicked cell has no adjacent mines
+         console.log('Recursive Case Triggered');
+        for (let i = clickedRow - 1; i <= clickedRow + 1; i++) {
+            for (let j = clickedCol - 1; j <= clickedCol + 1; j++) {
+                const button = board.querySelector(`button[data-row="${i}"][data-col="${j}"]`);
+                // check that button exists
+                if (button) {  
+                    console.log(`floodFill button row is ${i} and floodFill col is ${j}`);
+                    // check that button is unclicked and is not a mine.
+                    if (!button.classList.contains('clicked') && button.textContent !== '💣' ) {
+                        button.classList.add('clicked');
+                        button.textContent = adjMineCount.toString();
+                        floodFill(i, j);
+                    }
+                }    
+            }
+        }
+    }
 }   
 
 setBoardSize();
-
-
 
 // 1. Create click functionality for each cell in the 8 x 8 board
 // 2. Spawn mines (10 in easy mode) randomly in the remaining cells after user left clicks the first cell. First cell will not contain a mine.
