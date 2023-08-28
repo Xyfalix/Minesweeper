@@ -5,20 +5,33 @@ const timerDisplay = document.querySelector('.timer-display');
 const rightClickValues = ['🚩', '?', '']
 const highScoreButton = document.querySelector('.high-score');
 let isFirstClick = true;
-let startTime = 0; // Initialize the start time to 0
-let intervalId = null; // Initialize interval ID to null
+let flagCount = 0;
+
+
+// Initialize timer elements
+let startTime = 0; 
+let intervalId = null;
+
+// For right click cycling
 let rightClickValuesIndex = 0;
 
+// Access mine display
+const mineDisplay = document.querySelector('.mine-display');
+let originalMineCount = parseInt(mineDisplay.textContent);
+
 // grid row and col sizes will change when difficulty changes
-let gridRowSize = 8; 
-let gridColSize = 8;
+let gridRowSize = 12; 
+let gridColSize = 12;
+
+// Initialize game over check
+let gameOver = false;
 
 
 function updateTimer() {
     const currentTime = Date.now(); // Get the current time in milliseconds
     elapsedTime = Math.floor((currentTime - startTime) / 1000); // Calculate elapsed time in seconds
     timerDisplay.textContent = elapsedTime;
-  }
+}
 
 function createButton(row, col) {
   const button = document.createElement('button');
@@ -35,36 +48,53 @@ function createButton(row, col) {
     }
     const clickedRow = event.target.getAttribute('data-row');
     const clickedCol = event.target.getAttribute('data-col');
-    alert(`Button clicked: Row ${row}, Column ${col}`);
     if (isFirstClick) {
         // Start timer on first left click
         if (intervalId === null) {
             startTime = Date.now();
             intervalId = setInterval(updateTimer, 1000);
         }
+        alert(`Button clicked: Row ${row}, Column ${col}`);
         console.log(`button clickedRow is ${clickedRow}, button clickedCol is ${clickedCol}`)
         spawnMine(clickedRow, clickedCol);
         floodFill(parseInt(clickedRow), parseInt(clickedCol));
         isFirstClick = false;
     } else {
+        // exit event listener if gameOver
+        if (gameOver) {
+            return
+        }
         console.log(`button clickedRow is ${clickedRow}, button clickedCol is ${clickedCol}`)
-        floodFill(parseInt(clickedRow), parseInt(clickedCol));
+        // trigger game over if user clicks on a cell with a mine
+        if (button.classList.contains('bomb')) {
+            alert('You clicked on a mine, Game Over :(')
+            const bombCellList = document.querySelectorAll('.bomb');
+            bombCellList.forEach(bombCell => {
+                bombCell.textContent = '💣💣';
+            });
+            gameOver = true;
+
+        } else {
+            floodFill(parseInt(clickedRow), parseInt(clickedCol));
+        }
     }
   });
 
+  // Event listener for right click
   button.addEventListener('contextmenu', (event) => {
     event.preventDefault(); // prevent the right click menu from appearing
-
     // exit event listener if button has already been left clicked
     // also exits event listener if user has not made the first left click
-    if (button.classList.contains('clicked') || isFirstClick) {
+    if (button.classList.contains('clicked') || isFirstClick || gameOver) {
         return
     }
-    
     // cycles clicked cell between  🚩, ?, and empty
     button.textContent = rightClickValues[rightClickValuesIndex]
-
     rightClickValuesIndex = (rightClickValuesIndex + 1) % rightClickValues.length;
+
+    // Update mine display based on number of flags
+    flagCount = 0;
+    mineDisplayUpdate();
 
   });
 
@@ -112,6 +142,7 @@ function spawnMine(clickedRow, clickedCol) {
         const button = board.querySelector(`button[data-row="${row}"][data-col="${col}"]`);
         if (button) {
             button.textContent = '💣'; // Update button text content to indicate a mine
+            button.classList.add('bomb'); // add the bomb class to cells with mines.
         }
     }
 
@@ -177,11 +208,36 @@ function floodFill(clickedRow, clickedCol) {
 }   
 
 // add functionality for high score button
-highScoreButton.addEventListener('click', () => {
-    alert('High Score Button was clicked!');
-})
+function checkHighScores() {
+    highScoreButton.addEventListener('click', () => {
+        alert('High Score Button was clicked!');
+    })
+}
+
+
+// count number of remaining mines based on flags placed.
+function mineDisplayUpdate() {
+    const buttons = document.querySelectorAll('.button');
+    let currentMineCount = parseInt(mineDisplay.textContent);
+    console.log(`current mine count is ${currentMineCount}`);
+
+    buttons.forEach(button => {
+        const buttonText = button.textContent;
+        
+        if (buttonText === '🚩') {
+            flagCount += 1;
+        }
+    });
+
+    console.log(`Flag count is ${flagCount}`)
+
+    currentMineCount = originalMineCount - flagCount;
+    console.log(`new mine count is ${currentMineCount}`);
+    mineDisplay.textContent = currentMineCount;
+}
 
 setBoardSize(gridRowSize, gridColSize);
+checkHighScores();
 
 //? TODO List
 
@@ -190,7 +246,11 @@ setBoardSize(gridRowSize, gridColSize);
 // If user accepts, reset game and switch difficulties.
 // If user declines, return to game.
 
-// 9. Add Game winning and game losing criteria
+
+// 10. Add Game winning criteria. When entire board has either been flagged or left clicked on, player wins
+
+// 11. When player clicks on a mine, trigger game over alert.
+
 
 // Javascript Code for Frame 2 (High Scores Page)
 // 1. Create 3 arrays (Easy Medium and Hard difficulties) that contains objects with properties of rank, name and time taken.
