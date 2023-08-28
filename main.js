@@ -2,30 +2,63 @@
 // create Minesweeper board element
 const board = document.querySelector('.board');
 const timerDisplay = document.querySelector('.timer-display');
-const rightClickValues = ['🚩', '?', '']
+
+// define constants for right click toggles
+const flagEmoji = '🚩';
+const questionMarkEmoji = '❓';
+const blankValue = '';
+
+// define constants for difficulty
+let easy = 'Easy';
+let medium = 'Medium';
+let hard = 'Hard';
+
+const bombEmoji = '💣';
 const highScoreButton = document.querySelector('.high-score');
 let isFirstClick = true;
-let flagCount = 0;
-
 
 // Initialize timer elements
 let startTime = 0; 
 let intervalId = null;
 
-// For right click cycling
-let rightClickValuesIndex = 0;
-
 // Access mine display
 const mineDisplay = document.querySelector('.mine-display');
-let originalMineCount = parseInt(mineDisplay.textContent);
 
-// grid row and col sizes will change when difficulty changes
-let gridRowSize = 12; 
-let gridColSize = 12;
+// default difficulty and sizes when game first launches
+let difficulty = easy; 
+let gridRowSize = 8;
+let gridColSize = 8;
+let totalMines = 10;
 
 // Initialize game over check
 let gameOver = false;
 
+function selectDifficulty() {
+    const difficultySelector = document.querySelector('.difficulty-selector');
+
+    // add event listener for drop-down difficulty selection
+    difficultySelector.addEventListener('change', () => {
+        console.log(difficultySelector.value);
+        difficulty = difficultySelector.value;
+            // grid row and col sizes will change when difficulty changes
+        if (difficulty === easy) {
+            gridRowSize = 8;
+            gridColSize = 8;
+            totalMines = 10;
+        } else if (difficulty === medium) {
+            gridRowSize = 16;
+            gridColSize = 16;
+            totalMines = 40;
+        } else if (difficulty === hard) {
+            gridRowSize = 16;
+            gridColSize = 30;
+            totalMines = 99;
+        } else {
+            console.log('To insert form for user to select custom grid sizes and mines values');
+        }
+        resetGame();
+    })
+}
 
 function updateTimer() {
     const currentTime = Date.now(); // Get the current time in milliseconds
@@ -35,6 +68,9 @@ function updateTimer() {
 
 function createButton(row, col) {
   const button = document.createElement('button');
+  // define right click values for cycling through
+  const rightClickValues = [flagEmoji, questionMarkEmoji, blankValue]
+  let rightClickIndex = 0;
   button.textContent = `${row},${col}`;
   button.classList.add('button');
   button.setAttribute('data-row', row); // Set data attribute for row
@@ -42,12 +78,12 @@ function createButton(row, col) {
   // create event listener for cell left click.
   button.addEventListener('click', (event) => {
     // exit event listener if button has already been clicked.
-    // exit event listener if 🚩 or ? has been placed on cell
-    if (button.classList.contains('clicked') || button.textContent === '🚩' || button.textContent === '?') {
+    // exit event listener if 🚩 or ❓ has been placed on cell
+    if (button.classList.contains('clicked') || button.textContent === flagEmoji || button.textContent === questionMarkEmoji) {
         return
     }
-    const clickedRow = event.target.getAttribute('data-row');
-    const clickedCol = event.target.getAttribute('data-col');
+    const clickedRow = parseInt(event.target.getAttribute('data-row'));
+    const clickedCol = parseInt(event.target.getAttribute('data-col'));
     if (isFirstClick) {
         // Start timer on first left click
         if (intervalId === null) {
@@ -57,7 +93,7 @@ function createButton(row, col) {
         alert(`Button clicked: Row ${row}, Column ${col}`);
         console.log(`button clickedRow is ${clickedRow}, button clickedCol is ${clickedCol}`)
         spawnMine(clickedRow, clickedCol);
-        floodFill(parseInt(clickedRow), parseInt(clickedCol));
+        floodFill((clickedRow), (clickedCol));
         isFirstClick = false;
     } else {
         // exit event listener if gameOver
@@ -70,9 +106,11 @@ function createButton(row, col) {
             alert('You clicked on a mine, Game Over :(')
             const bombCellList = document.querySelectorAll('.bomb');
             bombCellList.forEach(bombCell => {
-                bombCell.textContent = '💣💣';
+                bombCell.textContent = `${bombEmoji} ${bombEmoji}`;
             });
             gameOver = true;
+            // stop timer from incrementing
+            clearInterval(intervalId);
 
         } else {
             floodFill(parseInt(clickedRow), parseInt(clickedCol));
@@ -89,11 +127,10 @@ function createButton(row, col) {
         return
     }
     // cycles clicked cell between  🚩, ?, and empty
-    button.textContent = rightClickValues[rightClickValuesIndex]
-    rightClickValuesIndex = (rightClickValuesIndex + 1) % rightClickValues.length;
+    button.textContent = rightClickValues[rightClickIndex]
+    rightClickIndex = (rightClickIndex + 1) % rightClickValues.length;
 
     // Update mine display based on number of flags
-    flagCount = 0;
     mineDisplayUpdate();
 
   });
@@ -124,7 +161,7 @@ function getRandomInt(min, max) {
 function spawnMine(clickedRow, clickedCol) {
     // create array that will represent the row & col coordinates to spawn mines.
     const mineArray = [];
-    while (mineArray.length < 10) {
+    while (mineArray.length < totalMines) {
         mineCoordinates = [getRandomInt(0, gridRowSize), getRandomInt(0, gridColSize)]
         console.log(`mine coordinates are ${mineCoordinates}`);
 
@@ -141,7 +178,7 @@ function spawnMine(clickedRow, clickedCol) {
     for (const [row, col] of mineArray) {
         const button = board.querySelector(`button[data-row="${row}"][data-col="${col}"]`);
         if (button) {
-            button.textContent = '💣'; // Update button text content to indicate a mine
+            button.textContent = bombEmoji; // Update button text content to indicate a mine
             button.classList.add('bomb'); // add the bomb class to cells with mines.
         }
     }
@@ -160,7 +197,7 @@ function mineAdjacentCheck(clickedRow, clickedCol) {
             if (!(i === clickedRow && j === clickedCol)) {
                 console.log(`mineAdjCheck row is ${i}, mineAdjCheck col is ${j}.`)
                 const button = board.querySelector(`button[data-row="${i}"][data-col="${j}"]`);
-                if (button && button.textContent === '💣') {
+                if (button && button.textContent === bombEmoji) {
                     mineCounter += 1; 
                 }
             }
@@ -179,8 +216,6 @@ function floodFill(clickedRow, clickedCol) {
         console.log('Base case triggered.');
         const clickedButton = board.querySelector(`button[data-row="${clickedRow}"][data-col="${clickedCol}"]`);
         clickedButton.classList.add('clicked');
-        // remove box shadow so button looks pressed down
-        clickedButton.style.boxShadow = '0px 0px grey';
         clickedButton.textContent = adjMineCount.toString();
         return;
 
@@ -194,10 +229,8 @@ function floodFill(clickedRow, clickedCol) {
                 if (button) {  
                     console.log(`floodFill button row is ${i} and floodFill col is ${j}`);
                     // check that button is unclicked and is not a mine.
-                    if (!button.classList.contains('clicked') && button.textContent !== '💣' ) {
+                    if (!button.classList.contains('clicked') && !button.classList.contains('bomb') && button.textContent !== flagEmoji && button.textContent !== questionMarkEmoji ) {
                         button.classList.add('clicked');
-                        // remove box shadow so button looks pressed down
-                        button.style.boxShadow = '0px 0px grey';
                         button.textContent = adjMineCount.toString();
                         floodFill(i, j);
                     }
@@ -217,27 +250,57 @@ function checkHighScores() {
 
 // count number of remaining mines based on flags placed.
 function mineDisplayUpdate() {
-    const buttons = document.querySelectorAll('.button');
+    let flagCount = 0;
+    const buttons = document.querySelectorAll('button');
     let currentMineCount = parseInt(mineDisplay.textContent);
     console.log(`current mine count is ${currentMineCount}`);
 
     buttons.forEach(button => {
         const buttonText = button.textContent;
         
-        if (buttonText === '🚩') {
+        if (buttonText === flagEmoji) {
             flagCount += 1;
         }
     });
 
     console.log(`Flag count is ${flagCount}`)
 
-    currentMineCount = originalMineCount - flagCount;
+    currentMineCount = totalMines - flagCount;
     console.log(`new mine count is ${currentMineCount}`);
     mineDisplay.textContent = currentMineCount;
 }
 
-setBoardSize(gridRowSize, gridColSize);
-checkHighScores();
+function resetGame() {
+    console.log('Game reset triggered')
+    isFirstClick = true;
+    gameOver = false;
+
+    // reset timer
+    clearInterval(intervalId);
+    intervalId = null;
+    timerDisplay.textContent = 0;
+
+    // reset mines left
+    mineDisplay.textContent = totalMines;
+
+    // clear board
+    while(board.firstChild) {
+        board.removeChild(board.lastChild);
+    }
+
+    console.log(`current difficulty is ${difficulty}`)
+    console.log(`row size is ${gridRowSize}, col size is ${gridColSize}`)
+    // recreate board based on selected difficulty
+    setBoardSize(gridRowSize, gridColSize);
+}
+
+function main() {
+    selectDifficulty();
+    setBoardSize(gridRowSize, gridColSize);
+    checkHighScores();
+}
+
+main();
 
 //? TODO List
 
