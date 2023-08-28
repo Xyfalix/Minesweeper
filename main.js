@@ -35,29 +35,36 @@ let gameOver = false;
 
 function selectDifficulty() {
     const difficultySelector = document.querySelector('.difficulty-selector');
-
+    let previousDifficulty = difficulty;
     // add event listener for drop-down difficulty selection
     difficultySelector.addEventListener('change', () => {
-        console.log(difficultySelector.value);
-        difficulty = difficultySelector.value;
+
+        // Set confirmation dialog with difficulty is changed.
+        const confirmation = window.confirm('Are you sure you want to change difficulties? This will reset the game! ');
+
+        if (confirmation) {
+            difficulty = difficultySelector.value;
             // grid row and col sizes will change when difficulty changes
-        if (difficulty === easy) {
-            gridRowSize = 8;
-            gridColSize = 8;
-            totalMines = 10;
-        } else if (difficulty === medium) {
-            gridRowSize = 16;
-            gridColSize = 16;
-            totalMines = 40;
-        } else if (difficulty === hard) {
-            gridRowSize = 16;
-            gridColSize = 30;
-            totalMines = 99;
+            if (difficulty === easy) {
+                gridRowSize = 8;
+                gridColSize = 8;
+                totalMines = 10;
+            } else if (difficulty === medium) {
+                gridRowSize = 16;
+                gridColSize = 16;
+                totalMines = 40;
+            } else if (difficulty === hard) {
+                gridRowSize = 16;
+                gridColSize = 30;
+                totalMines = 99;
+            } else {
+                console.log('To insert form for user to select custom grid sizes and mines values');
+            }
+            resetGame();
         } else {
-            console.log('To insert form for user to select custom grid sizes and mines values');
+            difficultySelector.value = previousDifficulty;
         }
-        resetGame();
-    })
+    });
 }
 
 function updateTimer() {
@@ -114,6 +121,7 @@ function createButton(row, col) {
 
         } else {
             floodFill(parseInt(clickedRow), parseInt(clickedCol));
+            checkWin();
         }
     }
   });
@@ -294,6 +302,25 @@ function resetGame() {
     setBoardSize(gridRowSize, gridColSize);
 }
 
+function checkWin() {
+    const buttons = document.querySelectorAll('button');
+    const totalCells = gridColSize * gridRowSize;
+    let cellCounter = 0;
+    buttons.forEach(button => {
+        const hasClickedClass = button.classList.contains('clicked');
+        const hasBombClass = button.classList.contains('bomb');
+
+        if(hasClickedClass || hasBombClass) {
+            cellCounter += 1;
+        }
+    });
+    if (totalCells === cellCounter) {
+        console.log('Player wins!');
+        
+        gameOver = true;
+    }
+}
+
 function main() {
     selectDifficulty();
     setBoardSize(gridRowSize, gridColSize);
@@ -311,9 +338,6 @@ main();
 
 
 // 10. Add Game winning criteria. When entire board has either been flagged or left clicked on, player wins
-
-// 11. When player clicks on a mine, trigger game over alert.
-
 
 // Javascript Code for Frame 2 (High Scores Page)
 // 1. Create 3 arrays (Easy Medium and Hard difficulties) that contains objects with properties of rank, name and time taken.
