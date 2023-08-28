@@ -3,6 +3,7 @@
 const board = document.querySelector('.board');
 const timerDisplay = document.querySelector('.timer-display');
 const rightClickValues = ['🚩', '?', '']
+const highScoreButton = document.querySelector('.high-score');
 let isFirstClick = true;
 let startTime = 0; // Initialize the start time to 0
 let intervalId = null; // Initialize interval ID to null
@@ -175,19 +176,21 @@ function floodFill(clickedRow, clickedCol) {
     }
 }   
 
+// add functionality for high score button
+highScoreButton.addEventListener('click', () => {
+    alert('High Score Button was clicked!');
+})
 
 setBoardSize(gridRowSize, gridColSize);
 
 //? TODO List
-// 7. Create functionality for the Change Name button
 
 // 8. Create dropdown functionality for difficulty level selection. 
 // Once difficulty level different from current difficulty is selected, prompt user that switching difficulty will reset the game.
 // If user accepts, reset game and switch difficulties.
 // If user declines, return to game.
 
-// 9. Create button functionality for View High Scores. To use console log as a placeholder.
-// Link to actual high score page once it is ready.
+// 9. Add Game winning and game losing criteria
 
 // Javascript Code for Frame 2 (High Scores Page)
 // 1. Create 3 arrays (Easy Medium and Hard difficulties) that contains objects with properties of rank, name and time taken.
@@ -199,12 +202,6 @@ setBoardSize(gridRowSize, gridColSize);
 // 7. Create button functionality for Go Back button
 // 8. Create button functionality for Reset High Scores Button
 
-// HTML Code for Frame 3 (MineSweeper Start Page)
-// 1. Create Minesweeper text
-// 2. Create instructions text
-// 3. Create entry to enter name
-// 4. Create Play! button functionality. Set restriction that name entry has at least 3 characters before player can access Frame 1.
-// If not, show a prompt telling player that at least 3 characters is required for name.
 
 // Misc JavaScript Code
 // Hide elements from inactive frames.
