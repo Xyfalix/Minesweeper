@@ -48,18 +48,39 @@ function selectDifficulty() {
                 gridRowSize = 8;
                 gridColSize = 8;
                 totalMines = 10;
+                resetGame();
             } else if (difficulty === medium) {
                 gridRowSize = 16;
                 gridColSize = 16;
                 totalMines = 40;
+                resetGame();
             } else if (difficulty === hard) {
                 gridRowSize = 16;
                 gridColSize = 30;
                 totalMines = 99;
+                resetGame();
             } else { //custom difficulty
-                console.log('To insert form for user to select custom grid sizes and mines values');
+                const customModal = document.getElementById('custom-difficulty-modal');
+                customModal.showModal();
+                const customConfirm = document.getElementById('custom-confirm');
+                customConfirm.addEventListener('click', () => {
+                    const customRows = document.getElementById('custom-rows');
+                    let customRowValue = customRows.value;
+                    const customCols = document.getElementById('custom-cols');
+                    let customColValue = customCols.value;
+                    const customMines = document.getElementById('custom-mines');
+                    let customMineValue = customMines.value;
+                    console.log(`custom row value is ${customRowValue}`);
+                    gridRowSize = customRowValue;
+                    gridColSize = customColValue;
+                    totalMines = customMineValue;
+                    resetGame();
+                })
+                const customCancel = document.getElementById('custom-cancel');
+                customCancel.addEventListener('click', () => {
+                    difficultySelector.value = previousDifficulty;
+                })
             }
-            resetGame();
         } else {
             difficultySelector.value = previousDifficulty;
         }

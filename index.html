@@ -15,6 +15,7 @@
     <script src="main.js" defer></script>
 </head>
 <body>
+    <h1>Minesweeper</h1>
     <div class="mine-container">
         <div class="mine-text">Mines left:</div>
         <div class="mine-display">10</div>
@@ -34,6 +35,7 @@
             <option value="Easy">Easy</option>
             <option value="Medium">Medium</option>
             <option value="Hard">Hard</option>
+            <option value="Custom">Custom</option>
         </select>
     </div>
 
@@ -90,28 +92,28 @@
         </div>
     </dialog>
 
-    <dialog id="custom-difficulty-modal" class="modal" open>
+    <dialog id="custom-difficulty-modal" class="modal">
         <div id="customDifficulty-textbox" class="modal-textbox">
             <h2>Custom Settings</h2>
             <div class="custom-container">
                 <div class="custom-rows">
-                    <label for="rows">Rows:</label>
-                    <input type="number" id="rows" min="1" value="8">
+                    <label>Rows:</label>
+                    <input type="number" id="custom-rows" min="1" value="8">
                 </div>
                 <div class="custom-cols">
-                    <label for="cols">Columns:</label>
-                    <input type="number" id="cols" min="1" value="8">
+                    <label>Columns:</label>
+                    <input type="number" id="custom-cols" min="1" value="8">
                 </div>
                 <div class="custom-mines">
-                    <label for="mines">Mines:</label>
-                    <input type="number" id="mines" min="1" value="10">
+                    <label>Mines:</label>
+                    <input type="number" id="custom-mines" min="1" value="10">
                 </div>
             </div>
             
           <div class="modal-footer custom-buttons-container">
             <form method="dialog">
               <button class="modal-buttons custom-buttons" id="custom-confirm">Confirm</button>
-              <button class="modal-buttons custom-buttons" class="close">Cancel</button>
+              <button class="modal-buttons custom-buttons" id="custom-cancel" class="close">Cancel</button>
             </form>
           </div>
         </div>
