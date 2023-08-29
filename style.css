@@ -202,3 +202,38 @@
    #lose-play-again {
     margin-right: 150px;
    }
+
+   #customDifficulty-textbox {
+    background-color: white;
+    font-size: 18px;
+    height: 250px;
+    width: 400px;
+    border-radius: 2px;
+    margin: 150px auto;
+    text-align: center;
+    box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
+    padding: 2%;
+    line-height: 120%;
+   }
+
+   .custom-container {
+    display: flex;
+    flex-direction: column;
+   }
+
+   .custom-rows,
+   .custom-cols,
+   .custom-mines {
+       margin: 5px 0; 
+   }
+
+   .custom-buttons-container {
+    display: flex;
+    justify-content: center; 
+    align-items: center;
+    margin-top: 30px;
+   }
+
+   .custom-buttons {
+    margin: 0 15px;
+   }

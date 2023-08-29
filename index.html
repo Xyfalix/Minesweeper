@@ -44,7 +44,7 @@
     <dialog id="win-modal" class="modal">
         <div class="modal-textbox">
           <h1>You win!</h1>
-          <p>
+          <p id="win-modal-message">
             You cleared the easy board with a time of xx min xx sec! You can enter your name in the field below and press submit to save your time in the high scores, or press close if you don't wish to do so.
           </p>
           <div class="input-container">
@@ -87,6 +87,33 @@
                   <button class="responseModal-buttons" class="close">Close</button>
                 </form>
             </div>
+        </div>
+    </dialog>
+
+    <dialog id="custom-difficulty-modal" class="modal" open>
+        <div id="customDifficulty-textbox" class="modal-textbox">
+            <h2>Custom Settings</h2>
+            <div class="custom-container">
+                <div class="custom-rows">
+                    <label for="rows">Rows:</label>
+                    <input type="number" id="rows" min="1" value="8">
+                </div>
+                <div class="custom-cols">
+                    <label for="cols">Columns:</label>
+                    <input type="number" id="cols" min="1" value="8">
+                </div>
+                <div class="custom-mines">
+                    <label for="mines">Mines:</label>
+                    <input type="number" id="mines" min="1" value="10">
+                </div>
+            </div>
+            
+          <div class="modal-footer custom-buttons-container">
+            <form method="dialog">
+              <button class="modal-buttons custom-buttons" id="custom-confirm">Confirm</button>
+              <button class="modal-buttons custom-buttons" class="close">Cancel</button>
+            </form>
+          </div>
         </div>
     </dialog>
 

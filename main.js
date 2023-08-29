@@ -72,6 +72,12 @@ function updateTimer() {
     timerDisplay.textContent = elapsedTime;
 }
 
+function formatTime(timeInSeconds) {
+    const minutes = Math.floor(timeInSeconds / 60);
+    const seconds = timeInSeconds % 60;
+    return `${minutes} min ${seconds} sec`;
+}
+
 function createButton(row, col) {
   const button = document.createElement('button');
   // define right click values for cycling through
@@ -285,7 +291,6 @@ function pressReset() {
     });
 }
 
-
 // count number of remaining mines based on flags placed.
 function mineDisplayUpdate() {
     const buttons = document.querySelectorAll('button');
@@ -348,7 +353,11 @@ function checkWin() {
     if (totalCells === cellCounter) {
         gameOver = true;
         console.log('Player wins!');
+        // stop timer from incrementing
+        clearInterval(intervalId);
         const winModal = document.getElementById('win-modal');
+        const winModalMessage = document.getElementById('win-modal-message');
+        winModalMessage.textContent = `You cleared ${difficulty} difficulty in ${formatTime(timerDisplay.textContent)}! You can enter your name in the field below and press submit to save your time in the high scores, or press close if you don't wish to do so.`;
         winModal.showModal();
         const playerNameInput = document.getElementById('player-name');
         const submitButton = document.getElementById('submit');
