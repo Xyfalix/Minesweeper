@@ -75,7 +75,7 @@ function updateTimer() {
 function createButton(row, col) {
   const button = document.createElement('button');
   // define right click values for cycling through
-  const rightClickValues = [flagEmoji, questionMarkEmoji, blankValue]
+  let rightClickValues = [flagEmoji, questionMarkEmoji, blankValue]
   let rightClickIndex = 0;
 //   button.textContent = `${row},${col}`;
   button.classList.add('button');
@@ -138,11 +138,25 @@ function createButton(row, col) {
     if (button.classList.contains('clicked') || isFirstClick || gameOver) {
         return
     }
-    // cycles clicked cell between  🚩, ?, and empty
-    button.textContent = rightClickValues[rightClickIndex]
-    rightClickIndex = (rightClickIndex + 1) % rightClickValues.length;
+    if (totalMines - mineDisplayUpdate() > 0) {
+        // number of flags < total number of mines
+        rightClickValues = [flagEmoji, questionMarkEmoji, blankValue];
+        button.textContent = rightClickValues[rightClickIndex];
+        rightClickIndex = (rightClickIndex + 1) % rightClickValues.length;
+    } else if (totalMines - mineDisplayUpdate() <= 0 && button.textContent === flagEmoji) {
+        // number of flags = total number of mines and cell is flagged
+        rightClickValues = [flagEmoji, questionMarkEmoji, blankValue];
+        button.textContent = rightClickValues[rightClickIndex];
+        rightClickIndex = (rightClickIndex + 1) % rightClickValues.length;
+    } else {
+        // number of flags = total number of mines and cell is question mark or blank
+        rightClickValues = [questionMarkEmoji, blankValue];
+        button.textContent = rightClickValues[rightClickIndex];
+        rightClickIndex = (rightClickIndex + 1) % rightClickValues.length;
+    }
 
     // Update mine display based on number of flags
+    console.log(mineDisplayUpdate());
     mineDisplayUpdate();
 
   });
@@ -274,10 +288,10 @@ function pressReset() {
 
 // count number of remaining mines based on flags placed.
 function mineDisplayUpdate() {
-    let flagCount = 0;
     const buttons = document.querySelectorAll('button');
     let currentMineCount = parseInt(mineDisplay.textContent);
     console.log(`current mine count is ${currentMineCount}`);
+    let flagCount = 0;
 
     buttons.forEach(button => {
         const buttonText = button.textContent;
@@ -292,6 +306,7 @@ function mineDisplayUpdate() {
     currentMineCount = totalMines - flagCount;
     console.log(`new mine count is ${currentMineCount}`);
     mineDisplay.textContent = currentMineCount;
+    return flagCount;
 }
 
 function resetGame() {
@@ -367,13 +382,7 @@ main();
 
 //? TODO List
 
-// 8. Create dropdown functionality for difficulty level selection. 
-// Once difficulty level different from current difficulty is selected, prompt user that switching difficulty will reset the game.
-// If user accepts, reset game and switch difficulties.
-// If user declines, return to game.
-
-
-// 10. Add Game winning criteria. When entire board has either been flagged or left clicked on, player wins
+// 1. Create custom difficulty and modal popup that prompts user for grid and cols and number of mines. Number of mines cannot exceed (grid * col) - 10
 
 // Javascript Code for Frame 2 (High Scores Page)
 // 1. Create 3 arrays (Easy Medium and Hard difficulties) that contains objects with properties of rank, name and time taken.
@@ -384,8 +393,4 @@ main();
 // 6. If not, show the timing at the bottom of the top 10, but this value gets deleted once user goes back to Frame 1.
 // 7. Create button functionality for Go Back button
 // 8. Create button functionality for Reset High Scores Button
-
-
-// Misc JavaScript Code
-// Hide elements from inactive frames.
 
