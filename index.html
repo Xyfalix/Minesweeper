@@ -37,6 +37,26 @@
         </select>
     </div>
 
+    <dialog id="win-modal" class="modal" open>
+        <div class="modal-textbox">
+          <h1>You win!</h1>
+          <p>
+            You cleared the easy board with a time of xx min xx sec! You can enter your name in the field below and press submit to save your time in the high scores, or press close if you don't wish to do so.
+          </p>
+          <div class="input-container">
+            <label>Name: </label>
+            <input type="text" id="player-name" placeholder="Your Name">
+          </div>
+          <div class="modal-footer">
+            <form method="dialog">
+              <button class="modal-buttons" id="submit">Submit</button>
+              <button class="modal-buttons" id="close">Close</button>
+            </form>
+          </div>
+        </div>
+    </dialog>
+
+
     <button class="high-score">View High Scores</button>
 </body>
 </html>

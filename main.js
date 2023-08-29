@@ -315,9 +315,16 @@ function checkWin() {
         }
     });
     if (totalCells === cellCounter) {
-        console.log('Player wins!');
-        
         gameOver = true;
+        console.log('Player wins!');
+        const winModal = document.querySelector('#win-modal');
+        winModal.showModal();
+        const playerNameInput = document.getElementById('player-name');
+        const submitButton = document.getElementById('submit');
+        submitButton.addEventListener('click', () => {
+            const playerName = playerNameInput.value;
+            console.log(`Player name is: ${playerName}`)
+        })
     }
 }
 
