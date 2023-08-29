@@ -25,7 +25,7 @@
     </div>
 
     <div class="board">
-        <!-- Buttons will be added dynamically using JavaScript -->
+        <!-- Cells will be added dynamically using JavaScript -->
     </div>
 
     <div class="difficulty-container">
@@ -37,7 +37,11 @@
         </select>
     </div>
 
-    <dialog id="win-modal" class="modal" open>
+    <button class="high-score">View High Scores</button>
+    <button class="reset">Reset Game</button>
+
+
+    <dialog id="win-modal" class="modal">
         <div class="modal-textbox">
           <h1>You win!</h1>
           <p>
@@ -50,13 +54,41 @@
           <div class="modal-footer">
             <form method="dialog">
               <button class="modal-buttons" id="submit">Submit</button>
-              <button class="modal-buttons" id="close">Close</button>
+              <button class="modal-buttons" class="close">Close</button>
             </form>
           </div>
         </div>
     </dialog>
 
+    <dialog id="lose-modal" class="modal">
+        <div id="loseModal-textbox" class="modal-textbox">
+          <h1>You lose!</h1>
+          <p>
+            You clicked on a mine, start a new game by clicking on Play again! 
+          </p>
+          <div class="modal-footer">
+            <form method="dialog">
+              <button class="modal-buttons" id="lose-play-again">Play Again</button>
+              <button class="modal-buttons" class="close">Close</button>
+            </form>
+          </div>
+        </div>
+    </dialog>
 
-    <button class="high-score">View High Scores</button>
+    <dialog id="responseModal" class="modal">
+        <div id="responseModal-textbox" class="modal-textbox">
+            <p>
+                Thank you, your name has been submitted!
+            </p>
+            <div id="responseModal-footer">
+                <form method="dialog">
+                  <button class="responseModal-buttons" id="view-highscores">View High Scores</button>
+                  <button class="responseModal-buttons" id="win-play-again">Play Again</button>
+                  <button class="responseModal-buttons" class="close">Close</button>
+                </form>
+            </div>
+        </div>
+    </dialog>
+
 </body>
 </html>

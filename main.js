@@ -14,7 +14,6 @@ let medium = 'Medium';
 let hard = 'Hard';
 
 const bombEmoji = '💣';
-const highScoreButton = document.querySelector('.high-score');
 let isFirstClick = true;
 
 // Initialize timer elements
@@ -57,7 +56,7 @@ function selectDifficulty() {
                 gridRowSize = 16;
                 gridColSize = 30;
                 totalMines = 99;
-            } else {
+            } else { //custom difficulty
                 console.log('To insert form for user to select custom grid sizes and mines values');
             }
             resetGame();
@@ -78,7 +77,7 @@ function createButton(row, col) {
   // define right click values for cycling through
   const rightClickValues = [flagEmoji, questionMarkEmoji, blankValue]
   let rightClickIndex = 0;
-  button.textContent = `${row},${col}`;
+//   button.textContent = `${row},${col}`;
   button.classList.add('button');
   button.setAttribute('data-row', row); // Set data attribute for row
   button.setAttribute('data-col', col); // Set data attribute for column
@@ -97,7 +96,6 @@ function createButton(row, col) {
             startTime = Date.now();
             intervalId = setInterval(updateTimer, 1000);
         }
-        alert(`Button clicked: Row ${row}, Column ${col}`);
         console.log(`button clickedRow is ${clickedRow}, button clickedCol is ${clickedCol}`)
         spawnMine(clickedRow, clickedCol);
         floodFill((clickedRow), (clickedCol));
@@ -110,7 +108,6 @@ function createButton(row, col) {
         console.log(`button clickedRow is ${clickedRow}, button clickedCol is ${clickedCol}`)
         // trigger game over if user clicks on a cell with a mine
         if (button.classList.contains('bomb')) {
-            alert('You clicked on a mine, Game Over :(')
             const bombCellList = document.querySelectorAll('.bomb');
             bombCellList.forEach(bombCell => {
                 bombCell.textContent = `${bombEmoji} ${bombEmoji}`;
@@ -118,7 +115,14 @@ function createButton(row, col) {
             gameOver = true;
             // stop timer from incrementing
             clearInterval(intervalId);
-
+            // Lose Modal Popup
+            const loseModal = document.getElementById('lose-modal');
+            loseModal.showModal();
+            const losePlayAgain = document.getElementById('lose-play-again');
+            losePlayAgain.addEventListener('click', () => {
+                console.log("Resetting Game")
+                resetGame();
+            });
         } else {
             floodFill(parseInt(clickedRow), parseInt(clickedCol));
             checkWin();
@@ -250,9 +254,21 @@ function floodFill(clickedRow, clickedCol) {
 
 // add functionality for high score button
 function checkHighScores() {
+    const highScoreButton = document.querySelector('.high-score');
     highScoreButton.addEventListener('click', () => {
         alert('High Score Button was clicked!');
     })
+}
+
+// add functionality for reset button
+function pressReset() {
+    const resetButton = document.querySelector('.reset');    
+    resetButton.addEventListener('click', () => {
+        const confirmation = window.confirm('Are you sure you want to reset the game? All current progress will be lost!');
+        if (confirmation) {
+            resetGame();
+        }
+    });
 }
 
 
@@ -317,13 +333,25 @@ function checkWin() {
     if (totalCells === cellCounter) {
         gameOver = true;
         console.log('Player wins!');
-        const winModal = document.querySelector('#win-modal');
+        const winModal = document.getElementById('win-modal');
         winModal.showModal();
         const playerNameInput = document.getElementById('player-name');
         const submitButton = document.getElementById('submit');
         submitButton.addEventListener('click', () => {
             const playerName = playerNameInput.value;
-            console.log(`Player name is: ${playerName}`)
+            console.log(`Player name is: ${playerName}`);
+            const responseModal = document.getElementById('responseModal');
+            responseModal.showModal();
+            const viewHighScores = document.getElementById('view-highscores');
+            viewHighScores.addEventListener('click', () => {
+                console.log("View High Scores Placeholder");
+            });
+            const winPlayAgain = document.getElementById('win-play-again');
+            winPlayAgain.addEventListener('click', () => {
+                console.log("Resetting Game")
+                resetGame();
+            })
+            
         })
     }
 }
@@ -332,6 +360,7 @@ function main() {
     selectDifficulty();
     setBoardSize(gridRowSize, gridColSize);
     checkHighScores();
+    pressReset();
 }
 
 main();
