@@ -64,12 +64,22 @@ function selectDifficulty() {
                 customModal.showModal();
                 const customConfirm = document.getElementById('custom-confirm');
                 customConfirm.addEventListener('click', () => {
+                    // get inputs from modal
                     const customRows = document.getElementById('custom-rows');
                     let customRowValue = customRows.value;
                     const customCols = document.getElementById('custom-cols');
                     let customColValue = customCols.value;
                     const customMines = document.getElementById('custom-mines');
                     let customMineValue = customMines.value;
+
+                    // Set maximum number of mines to row * col - 11
+                    const maxMines = customRowValue * customColValue - 11;
+                    if (customMineValue > maxMines) {
+                        alert(`For a row size of ${customRowValue} and col size of ${customColValue}, your number of mines cannot exceed ${maxMines}`)
+                        difficultySelector.value = previousDifficulty;
+                        return
+                    }
+
                     console.log(`custom row value is ${customRowValue}`);
                     gridRowSize = customRowValue;
                     gridColSize = customColValue;
@@ -137,7 +147,7 @@ function createButton(row, col) {
         if (button.classList.contains('bomb')) {
             const bombCellList = document.querySelectorAll('.bomb');
             bombCellList.forEach(bombCell => {
-                bombCell.textContent = `${bombEmoji} ${bombEmoji}`;
+                bombCell.textContent = `${bombEmoji}`;
             });
             gameOver = true;
             // stop timer from incrementing
@@ -231,7 +241,7 @@ function spawnMine(clickedRow, clickedCol) {
     for (const [row, col] of mineArray) {
         const button = board.querySelector(`button[data-row="${row}"][data-col="${col}"]`);
         if (button) {
-            button.textContent = bombEmoji; // Update button text content to indicate a mine
+            // button.textContent = bombEmoji; // Update button text content to indicate a mine
             button.classList.add('bomb'); // add the bomb class to cells with mines.
         }
     }
@@ -250,7 +260,7 @@ function mineAdjacentCheck(clickedRow, clickedCol) {
             if (!(i === clickedRow && j === clickedCol)) {
                 console.log(`mineAdjCheck row is ${i}, mineAdjCheck col is ${j}.`)
                 const button = board.querySelector(`button[data-row="${i}"][data-col="${j}"]`);
-                if (button && button.textContent === bombEmoji) {
+                if (button && button.classList.contains('bomb')) {
                     mineCounter += 1; 
                 }
             }
@@ -284,7 +294,7 @@ function floodFill(clickedRow, clickedCol) {
                     // check that button is unclicked and is not a mine.
                     if (!button.classList.contains('clicked') && !button.classList.contains('bomb') && button.textContent !== flagEmoji && button.textContent !== questionMarkEmoji ) {
                         button.classList.add('clicked');
-                        button.textContent = adjMineCount.toString();
+                        // button.textContent = adjMineCount.toString();
                         floodFill(i, j);
                     }
                 }    
